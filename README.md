@@ -1,3 +1,3 @@
 # iNote
 i note,i blog,i record,i share
-123
+爱笔记，爱博客，爱记录，爱分享
