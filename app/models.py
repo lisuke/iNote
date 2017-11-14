@@ -82,10 +82,6 @@ class User(UserMixin,db.Model):
     email = db.Column(db.String(64),unique=True,index=True)
     username = db.Column(db.String(64),unique=True,index=True)
     password_hash = db.Column(db.String(128))
-    # 外键关联
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    notes = db.relationship('Note',backref='users',lazy='dynamic')
-    friendlinks = db.relationship('Friendlink',backref='users',lazy='dynamic')
 
     @property
     def password(self):
@@ -138,6 +134,11 @@ class User(UserMixin,db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
 
+    # 外键关联
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    notes = db.relationship('Note', backref='users', lazy='dynamic')
+    friendlinks = db.relationship('Friendlink', backref='users', lazy='dynamic')
+
     tags = db.relationship('Tag',
                            secondary=user_use_tags_relation,
                            backref=db.backref('users',lazy='dynamic'),
@@ -149,6 +150,14 @@ class Tag(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(32),unique=True,index=True)
 
+class NoteCategory(db.Model):
+    __tablename__ = 'note_categories'
+    id = db.Column(db.Integer,primary_key=True,index=True)
+    name = db.Column(db.String(64),index=True)
+    children_id = db.Column(db.Integer, db.ForeignKey('note_categories.id'),index=True)
+    shared_status = db.Column(db.Integer)
+    parent = db.relationship('NoteCategory',backref='children',lazy='dynamic')
+
 class Note(db.Model):
     __tablename__ = 'notes'
     id = db.Column(db.Integer,primary_key = True)
@@ -157,7 +166,7 @@ class Note(db.Model):
     content = db.Column(db.Text(),index=True)
     create_date = db.Column(db.DateTime,default=datetime.utcnow())
     last_modify_date = db.Column(db.DateTime,default=datetime.utcnow())
-
+    note_category_id= db.Column(db.Integer, db.ForeignKey('note_categories.id'), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 class Article(db.Model):
