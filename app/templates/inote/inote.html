@@ -21,10 +21,21 @@
       <tbody>
         <tr>
           <td>
-              <div id="category"></div>
+              <div id="category" class="autoScroll">
+                <div style="height:2000px"></div>
+              </div>
           </td>
-          <td> </td>
-          <td> </td>
+          <td>
+              <div id="item" class="autoScroll">
+
+                <div style="height:2000px"></div>
+              </div>
+          </td>
+          <td>
+              <div id="content" class="autoScroll">
+                <div style="height:2000px"></div>
+              </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -42,9 +53,15 @@
         });
 
         $("#category").height($(window).height()-$("#category").position().top-1);
+        $("#item").height($(window).height()-$("#item").position().top-1);
+        $("#content").height($(window).height()-$("#content").position().top-1);
+
         $(window).resize(function () {
             $("#category").height($(window).height()-$("#category").position().top-1);
+            $("#item").height($(window).height()-$("#item").position().top-1);
+            $("#content").height($(window).height()-$("#content").position().top-1);
         });
+
     </script>
 
 {%- endblock scripts %}
