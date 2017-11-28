@@ -116,8 +116,17 @@
         });
 
 	function lazyLoad(event, data) {
-		console.log("inote/category/"+data.node.key)
-		// data.result = { url: "inote/category/"+data.node.key};
+		console.log("category/"+data.node.key)
+		data.result = {
+		    method:'GET',
+		    url:"category",
+		    data:{'id':'-1'},
+		    dataType: "json",
+		    contentType: "application/json; charset=utf-8",
+            success:function(data){
+                console.log(data)
+            },
+		};
 	}
 
 	function loadError(e,data) {
@@ -135,16 +144,17 @@
 		$("#tree").fancytree({
 			extensions: ["dnd5","edit","contextMenu"],
 			source: $.ajax({
-			    url: "/inote/category/-1",
-			    dataType: "json",
-			    method:'post'
-			}),
+		    method:'get',
+		    url:"category",
+		    data:{'id':'-1'},
+		    dataType: "json",
+		    contentType: "application/json; charset=utf-8",
+		}),
 			contextMenu: {
 				menu: {
 					"add": { "name": "Add", "icon": "add" },
 					"rename": { "name": "Rename", "icon": "edit" },
 					"delete": { "name": "Delete", "icon": "delete" },
-
 					"sep1": "---------",
 					"reload": { "name": "Reload", "icon": "reload" },
 					"sep2": "---------",
