@@ -116,17 +116,11 @@
         });
 
 	function lazyLoad(event, data) {
-		console.log("category/"+data.node.key)
-		data.result = {
-		    method:'GET',
-		    url:"category",
-		    data:{'id':'-1'},
-		    dataType: "json",
-		    contentType: "application/json; charset=utf-8",
-            success:function(data){
-                console.log(data)
-            },
-		};
+		//console.log("category/"+data.node.key)
+		data.result = $.getJSON({
+                url:"category",
+                data:{'id':data.node.key},
+            });
 	}
 
 	function loadError(e,data) {
@@ -139,17 +133,16 @@
 			data.details = "An error occurred during loading: " + error;
 		}
 	}
-
+    var hasnew = false;
+    var parent_key = -1;
+    var old_parent = undefined;
 	$(function(){
 		$("#tree").fancytree({
 			extensions: ["dnd5","edit","contextMenu"],
-			source: $.ajax({
-		    method:'get',
-		    url:"category",
-		    data:{'id':'-1'},
-		    dataType: "json",
-		    contentType: "application/json; charset=utf-8",
-		}),
+			source: $.getJSON({
+                url:"category",
+                data:{'id':'-1'},
+            }),
 			contextMenu: {
 				menu: {
 					"add": { "name": "Add", "icon": "add" },
@@ -175,10 +168,13 @@
 					}
 				},
 				actions: function(node, action, options) {
-					console.log("Selected '" + action + "' on " + node);
+					//console.log("Selected '" + action + "' on " + node);
 					if (action == 'add') {
 						// add
-						node.editCreateNode("child", "Node title");
+						hasnew = true;
+						var node = $("#tree").fancytree("getActiveNode");
+						parent_key = node.key;
+						node.editCreateNode("child", "new category");
 					}else if (action == 'delete') {
 						// delete
                         var node = $("#tree").fancytree("getActiveNode");
@@ -195,21 +191,13 @@
 			loadError: loadError,
 
 			createNode: function(event, data) {
-				console.log(event, data);
 			},
-
-			//
 			modifyChild: function(event, data) {
-				if (data.operation == 'remove') {console.log('delete: ',data.node)}
-				console.log(event, data, "operation=" + data.operation + ", child=" + data.childNode);
 			},
-			//
 			focus: function(event, data) {
-				console.log(event, data);
 			},
-			//
 			keydown: function(event, data) {
-				console.log('keydown: ',event.which);
+				//console.log('keydown: ',event.which);
 				switch( event.which ) {
 					case 32: // [space]
 						data.node.toggleSelected();
@@ -217,7 +205,6 @@
 					case 46: // [delete]
 						var node = $("#tree").fancytree("getActiveNode");
 						node.remove();
-
 						break;
 					case 116: // [F5]
 
@@ -230,6 +217,9 @@
 			},
 			dnd5: {
 				dragStart: function(node, data) {
+				    //old_parent = node.parent;
+				    node.old_expanded = node.isExpanded();
+				    node.setExpanded(false);
 					return true;
 				},
 				dragDrag: function(node, data) {
@@ -239,18 +229,67 @@
 				},
 				dragEnter: function(node, data) {
 					data.dataTransfer.dropEffect = "move";
+					node.enter='enter'
 					return true;
 				},
 				dragOver: function(node, data) {
 					data.dataTransfer.dropEffect = "move";
 				},
 				dragLeave: function(node, data) {
+					data.dataTransfer.dropEffect = "copy";
 				},
 				dragDrop: function(node, data) {
 					var transfer = data.dataTransfer;
 					if( data.otherNode ) {
-						var sameTree = (data.otherNode.tree === data.tree);
-						data.otherNode.moveTo(node, data.hitMode);
+					    var hasChange = false;
+					    var current_node_key = data.otherNode.key;
+					    var parent_node_key = -1;
+					    if(data.hitMode=='over')
+					    {
+					        console.log(node.title,' will is ',data.otherNode.title,"'s parent");
+					        hasChange = true;
+
+                            parent_node_key = node.key;
+					    }else{
+					        if(node.parent != data.otherNode.parent){
+					            console.log(node.title,' will is ',data.otherNode.title,"'s sibling");
+					            hasChange = true;
+
+					            if(node.parent.parent != null)
+                                    parent_node_key = node.parent.key;
+					        }
+					    }
+						if(hasChange){
+						    hasChange=false;
+						    var current_node = data.otherNode;
+
+						    $.ajax({
+                                type:'put',
+                                url:"category",
+                                data:JSON.stringify({
+                                    'type':'move to',
+                                    'current_cate_id':current_node_key,
+                                    'dest_parent_cate_id':parent_node_key
+                                }),
+                                dataType: "json",
+                                contentType: "application/json",
+                                success:function(data){
+                                    if(data.status == 'success'){
+                                        console.log('move to: successful')
+                                        current_node.moveTo(node, data.hitMode);
+                                        current_node.setExpanded(current_node.old_expanded);
+                                        //node.render()
+                                    }
+                                    else{
+                                        console.log('move to: ',data.status)
+                                        current_node.setExpanded(current_node.old_expanded);
+                                    }
+                                }
+                            });
+
+
+
+						}
 					} else if( data.otherNodeData ) {
 						node.addChild(data.otherNodeData, data.hitMode);
 					} else {
@@ -258,7 +297,7 @@
 							title: transfer.getData("text")
 						}, data.hitMode);
 					}
-					node.setExpanded();
+					node.setExpanded(node.old_expanded);
 				}
 			},
 			edit: {
@@ -273,9 +312,56 @@
                     }
                 },
                 save: function(event, data){
+                    old_title = data.node.title;
+                    current_node = data.node;
                     setTimeout(function(){
+                        if(hasnew){
+                        //new category
+                            hasnew = false;
+                            $.post({
+                                type:'post',
+                                url:"category",
+                                data:JSON.stringify({
+                                    'parent_cate_id':parent_key,
+                                    'new_cate_title':current_node.title
+                                }),
+                                dataType: "json",
+                                contentType: "application/json",
+                                success:function(data){
+                                    if(data)
+                                        current_node.key = data.id;
+                                }
+                            });
+                        }else{
+                        // rename category
+                            $.ajax({
+                                type:'put',
+                                url:"category",
+                                data:JSON.stringify({
+                                    'type':'rename',
+                                    'id':current_node.key,
+                                    'new_cate_title':current_node.title
+                                }),
+                                dataType: "json",
+                                contentType: "application/json",
+                                success:function(data){
+                                    if(data.status == 'success'){
+                                        console.log('rename: successful')
+                                    }
+                                    else if(data.status == 'permission denied'){
+                                        current_node.setTitle(old_title);
+                                    }
+                                    else if(data.status == 'cannot changed'){
+                                        current_node.setTitle(old_title);
+                                    }
+                                    else if(data.status == 'resource not found'){
+                                        current_node.setTitle(old_title);
+                                    }
+                                }
+                            });
+                        }
+
                         $(data.node.span).removeClass("pending");
-                        data.node.setTitle(data.node.title + "!");
                     }, 2000);
                     return true;
                 },
@@ -286,7 +372,7 @@
                 }
 			},
 			activate: function(event, data) {
-				console.log(data.node)
+				//console.log(data.node)
 			},
 			tooltip: function(event, data) {
 				return data.node.title;
