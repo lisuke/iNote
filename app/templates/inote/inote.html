@@ -133,16 +133,42 @@
 
     <script>
 
-        CKEDITOR.replace('ckeditor');
+        var ck_editor = CKEDITOR.replace('ckeditor');
+        ck_editor.on('instanceReady',function(event)                  //准备
+        {
+            var editor=event.editor;
+            setTimeout(function()
+                {     //延时加载
+                   if(!editor.element)
+                   {
+                        setTimeout(arguments.callee,1);
+                        return;
+                   }
+                   event.removeListener('instanceReady',this.callee);
+                   if(editor.name=='ckeditor')
+                   {
+                        var height = $(window).height()- $("#cke_1_top").position().top - $("#cke_1_top").outerHeight(true) - $("#cke_1_bottom").outerHeight(true);
+                        $('#cke_1_contents').height(height);
+                   }
+                },0);
+        },null,null,9999);
+
+        <!--//赋值-->
+        <!--ckeditor.setData("content");-->
+        <!--//获取源码-->
+        <!--ckeditor.getData();-->
 
         $("#category").height($(window).height()-$("#category").position().top-1);
         $("#items").height($(window).height()-$("#items").position().top-1);
         $("#content").height($(window).height()-$("#content").position().top-1);
 
+
         $(window).resize(function () {
             $("#category").height($(window).height()-$("#category").position().top-1);
             $("#items").height($(window).height()-$("#items").position().top-1);
             $("#content").height($(window).height()-$("#content").position().top-1);
+            var height = $(window).height()- $("#cke_1_top").position().top - $("#cke_1_top").outerHeight(true) - $("#cke_1_bottom").outerHeight(true);
+            $('#cke_1_contents').height(height);
         });
 
 	function lazyLoad(event, data) {
