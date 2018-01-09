@@ -118,7 +118,7 @@
                 data:JSON.stringify({
                     'cate_id':cate_id,
                     'note_title':getTitle(),
-                    'note_content':note_content,
+                    'note_content':getContent(),
                     'note_editor':editor_type
                 }),
                 dataType: "json",
