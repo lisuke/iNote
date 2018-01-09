@@ -131,10 +131,10 @@
             });
         };
         var setTitle = function(title){
-            $("#note-title").val(title);
+            $("#noteTitle").val(title);
         };
         var getTitle = function(){
-            return $("#note-title").val();
+            return $("#noteTitle").val();
         };
         var setContent = function(data){
             instance.setData(data);
