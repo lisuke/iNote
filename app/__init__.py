@@ -52,7 +52,7 @@ def create_app(config_name):
     app.register_blueprint(inote_blueprint, url_prefix='/inote')
 
     #
-    from .inote import inote as blog_blueprint
+    from .blog import blog as blog_blueprint
     app.register_blueprint(blog_blueprint, url_prefix='/blog')
 
 
