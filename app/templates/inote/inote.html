@@ -203,7 +203,6 @@
 
         $("#inote-table-frame").ready(function(){
             $("#inote-table-frame").colResizable();
-            console.log($('table'));
         });
 
         $("#category").height($(window).height()-$("#category").position().top-1);
@@ -238,15 +237,5 @@
                 });
             }
 
-        document.onkeydown = function(){
-            if (event.ctrlKey && event.keyCode==83)
-            {// Ctrl + S
-                console.log('Save: ');
-
-                note.create();
-
-                event.returnValue=false;
-            }
-        };
     </script>
 {%- endblock scripts %}
