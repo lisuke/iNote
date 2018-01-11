@@ -75,7 +75,7 @@
         var editor_type = EditorType;
         var note_title = "";
         var note_content = "";
-        var note_tags = null;
+        var note_tags = new Array;
         var create_datetime = "";
         var last_modify_datetime = "";
 
@@ -203,7 +203,7 @@
             });
         };
         var tags_update = function(){
-            if(note_tags != getTags())
+            if(note_tags.toString() != getTags().toString())
             post({
                 type:'post',
                 data:JSON.stringify({
@@ -268,6 +268,7 @@
             setContent : setContent,
             getContent : getContent,
             destruct : destruct,
+            update : update,
         };
     };
 
