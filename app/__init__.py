@@ -56,7 +56,6 @@ def create_app(config_name):
     from .blog import blog as blog_blueprint
     app.register_blueprint(blog_blueprint, subdomain='blog')
     app.register_blueprint(blog_blueprint, url_prefix='/blog')
-    app.register_blueprint(blog_blueprint, subdomain='lisuke.blog')
 
 
     return app
