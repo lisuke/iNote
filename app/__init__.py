@@ -25,6 +25,7 @@ login_manager.login_view = 'auth.login'
 
 
 
+
 def create_app(config_name):
     global app
     app = Flask(__name__)
@@ -53,7 +54,9 @@ def create_app(config_name):
 
     #
     from .blog import blog as blog_blueprint
+    app.register_blueprint(blog_blueprint, subdomain='blog')
     app.register_blueprint(blog_blueprint, url_prefix='/blog')
+    app.register_blueprint(blog_blueprint, subdomain='lisuke.blog')
 
 
     return app
