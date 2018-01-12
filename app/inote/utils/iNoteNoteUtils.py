@@ -36,6 +36,8 @@ class iNoteNoteUtil:
             if t_name == '':
                 continue
             tag = Tag.query.filter_by(name=t_name).first()
+            if tag in note.tags:
+                continue
             if tag is not None:
                 note.tags.append(tag)
             else:
@@ -117,6 +119,8 @@ class iNoteNoteUtil:
             else:
                 for t_name in json_tags:
                     tag = Tag.query.filter_by(name=t_name).first()
+                    if tag in note.tags:
+                        continue
                     if tag is not None:
                         note.tags.append(tag)
                     else:
@@ -124,6 +128,10 @@ class iNoteNoteUtil:
                         db.session.add(tag)
                         current_user.tags.append(tag)
                         note.tags.append(tag)
+                tags = note.tags.all()
+                for tag in tags:
+                    if not (tag.name in json_tags):
+                        note.tags.remove(tag)
                 db.session.commit()
                 return jsonify({'status':'success'})
 
