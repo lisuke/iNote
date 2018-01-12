@@ -252,6 +252,8 @@
         };
         var getTags = function(tags){
             var title = $("#noteTag").val();
+            if (title.substring(title.length-1) == ';')
+                title = title.substring(0,title.length-1)
             var tags = title.split(';');
             return tags;
         };
