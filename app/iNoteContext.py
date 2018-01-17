@@ -1,64 +1,73 @@
-#/bin/python
-
-class iNoteContext(dict):
-    def __init__(self):
-        pass
+#!/bin/python3
+class InjectContext(dict):
 
     def __enter__(self):
-        for func in iNoteContext.__funcs__:
-            func(ctx = self)
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
         pass
 
-    def __setattr__(self, key, value):
-        self[key] = value
-    def __getattr__(self, item):
-        return self[item]
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
-    @staticmethod
-    def ctx_func_init():
-        iNoteContext.__funcs__ = list()
+class INoteInject(dict):
 
-    def warp_inote_blog_ctx(name = 'inote_blog_ctx'):
-        def wapper(func):
-            def create_ctx(*args,**kwargs):
-                context = iNoteContext()
-                context.name = name
-                with context as ctx:
-                    kwargs[name] = ctx
-                    func(*args,**kwargs)
-            return create_ctx
-        return wapper
+    def __init__(self):
+        self['inject_classes'] = dict()
 
-    def register_enter_event(func):
-        iNoteContext.__funcs__.append(func)
-        def register(*args,**argv):
-            pass
-        return register
+    def __enter__(self):
+        for sub_ctx in self['inject_classes'].keys():
+            self['inject_classes'][sub_ctx].__enter__()
 
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        for sub_ctx in reversed(list(self['inject_classes'].keys())):
+            self['inject_classes'][sub_ctx].__exit__(exc_type,exc_val,exc_tb)
+
+    def inject_ctx_class(self,func):
+        ctx_class = func()
+        if not issubclass(ctx_class,InjectContext):
+            raise "inject_ctx_class: return class must be InjectContext's subclass"
+        self['inject_classes'][ctx_class.__name__] = ctx_class()
+        def warpper(*args,**kwargs):
+            return func()
+        return warpper
+
+    def use_ctx(self,func):
+        def warpper(*args, **kwargs):
+            with self:
+                func(*args,**kwargs)
+        return warpper
 #
-# iNoteContext.ctx_func_init()
+# home = INoteInject()
+# index = INoteInject()
+# #
 #
-# @iNoteContext.register_enter_event
-# def a(ctx):
-#     ctx['a'] = 1
+# @home.inject_ctx_class
+# def aaa():
+#     class aaa(InjectContext):
+#         def __enter__(self):
+#             print('enter: aaa')
+#         def __exit__(self, exc_type, exc_val, exc_tb):
+#             print('exit: aaa')
 #
-# @iNoteContext.register_enter_event
-# def b(ctx):
-#     ctx['b'] = 2
+#     return aaa
 #
-# @iNoteContext.register_enter_event
-# def c(ctx):
-#     ctx['c'] = 3
+# @index.inject_ctx_class
+# @home.inject_ctx_class
+# def bbb():
+#     class bbb(InjectContext):
+#         def __enter__(self):
+#             print('enter: bbb')
+#         def __exit__(self, exc_type, exc_val, exc_tb):
+#             print('exit: bbb')
+#
+#     return bbb
+#
+# @index.use_ctx
+# def test():
+#     print('test')
 #
 #
-# @iNoteContext.warp_inote_blog_ctx('inote_blog_ctx')
-# def b(inote_blog_ctx):
-#     print(inote_blog_ctx['a'])
-#     print(inote_blog_ctx['b'])
-#     print(inote_blog_ctx['c'])
+# @home.use_ctx
+# def testb():
+#     print(111)
+# test()
 #
-#
-# b()
+# testb()
