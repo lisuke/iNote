@@ -1,4 +1,4 @@
-{{template "header.html" .}}
+{% include 'header.html' %}
 
 <div id="postsContainer">
 	<div class="container">
@@ -11,8 +11,8 @@
 	</div>
 </div>
 
-{{template "footer.html" $}}
-{{template "highlight.html" $}}
+{% include 'footer.html' %}
+{% include 'highlight.html' %}
 
 </body>
 </html>

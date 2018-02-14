@@ -1,4 +1,4 @@
-{{template "header.html" .}}
+{% include 'header.html' %}
 
 <div id="postsContainer">
 	<div class="container">
@@ -6,13 +6,13 @@
 	</div>
 
 	<div id="posts">
-		{{template "post_abstract.html" $}}
+		{% include 'post_abstract.html' %}
 	    <!-- paging -->
-		{{template "paging.html" $}}
+		{% include 'paging.html' %}
 	</div>
 </div>
 
-{{template "footer.html" $}}
-{{template "highlight.html" $}}
+{% include 'footer.html' %}
+{% include 'highlight.html' %}
 </body>
 </html>
