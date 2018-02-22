@@ -6,7 +6,10 @@ from .inject.BlogInject import blogIndex
 
 @blog.errorhandler(404)
 def not_found():
-    return 'not found'
+    try:
+        return render_template(username + '/404.html', username=username)
+    except TemplateNotFound:
+        return render_template('default' + '/404.html', username=username)
 
 
 @blog.route('/', methods=['get'], subdomain='<sub_url>.blog')
