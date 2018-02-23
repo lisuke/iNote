@@ -1,0 +1,241 @@
+{%- extends "inote/inote_base.html" %}
+
+{% block styles -%}
+    {{super()}}
+    <link rel="stylesheet" type="text/css"
+          href="{{url_for('static', filename='style/base.css')}}">
+    <link rel="stylesheet" href="/static/style/jquery.resizableColumns.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.2.3/jquery.contextMenu.min.css" />
+    <link rel="stylesheet" href="http://wwwendt.de/tech/fancytree//src/skin-win8/ui.fancytree.css">
+<!--
+<style type="text/css">
+	#draggableSample, #droppableSample {
+	height:100px;
+	padding:0.5em;
+	width:150px;
+	border:1px solid #AAAAAA;
+	}
+	#draggableSample {
+	background-color: silver;
+	color:#222222;
+	}
+	#droppableSample {
+	background-color: maroon;
+	color: white;
+	}
+	#droppableSample.drophover {
+	border: 1px solid green;
+	}
+	#droppableSample.drophover {
+	border: 1px solid green;
+	}
+	span.drag-source {
+	border: 1px solid grey;
+	border-radius: 3px;
+	padding: 2px;
+	background-color: silver
+	}
+
+	ul.fancytree-container {
+	max-height: 200px;
+	overflow-y: scroll;
+	}
+
+	span.fancytree-node.fancytree-drag-source {
+	outline: 1px dotted grey;
+	}
+
+	span.fancytree-node.fancytree-drop-accept {
+	outline: 1px dotted green;
+	}
+	span.fancytree-node.fancytree-drop-reject {
+	outline: 1px dotted red;
+	}
+
+</style>
+-->
+
+{% endblock %}
+
+{% block inote_nav %}
+    <div id="inote-nav" style="height:60px">
+        <div id="inote-logo" style="float:left;width:140px;height:60px">
+
+        </div>
+        <div id="inote-user" class="menu-hover" style="float:right; height:60px;cursor:pointer;">
+            <a id="inote-user-dropdown" style="line-height: 60px;">
+                <img src="https://leanote.com/public/upload/581/5437cf594fadc048620000d9/images/logo/6e2ad83479b6b78d38933b02a4d7ace6.jpg" style="height: 30px;max-width: 30px;overflow: hidden;border-radius: 50%;">
+                <span class="inote-user-name">
+                    demo
+                </span>
+                <span class="caret"></span>
+            </a>
+            <ul class="menu-hover-display">
+                <li >
+                    <a href="#">blog</a>
+                </li>
+                <li >
+                    <a href="#">blog setting</a>
+                </li>
+                <li >
+                    <a href="#">admin</a>
+                </li>
+                <li >
+                    <a href="#">exit</a>
+                </li>
+            </ul>
+        </div>
+
+        <style type="text/css">
+
+            .menu-hover-display{
+                display:none;
+                width:140px;
+                position:relative;
+                z-index:999;
+            }
+
+            .menu-hover:hover .menu-hover-display{
+                background-color: rgb(220,220,220);
+                list-style-type: none;
+                display: block;
+            }
+
+            .menu-hover-display li{
+                padding:0px;
+                line-height: 28px;
+            }
+
+            .menu-hover-display li a{
+                display:inline-block;
+            }
+
+        </style>
+
+    </div>
+{% endblock %}
+
+
+{% block inote_foot %}
+
+{% endblock %}
+
+{% block inote_content %}
+
+    <table id="inote-table-frame" class=" table-bordered" style="width:100%">
+        <thead>
+            <tr height="50px">
+                <th width="20%">category</th>
+                <th width="25%">item</th>
+                <th>
+                    <div  class="dropdown">
+                        <button type="button" class="btn dropdown-toggle" id="dropdownMenu1"
+                                data-toggle="dropdown">
+                            {{_('create new Note')}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul id="inote-new-create" class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                            <!--
+                            <li role="presentation">
+                                <a id="c_n_ckeditor" role="menuitem" tabindex="-1" href="#">ckeditor</a>
+                            </li>
+                            -->
+                        </ul>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td valign="top">
+                    <div id="category" class="autoScroll">
+                        <div id="tree"></div>
+                    </div>
+                </td>
+                <td valign="top">
+                    <div id="items" class="autoScroll">
+
+                    </div>
+                </td>
+                <td valign="top">
+                    <div id="content" class="autoScroll">
+                        <!---->
+
+                        <!---->
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    <!--{{super()}}-->
+
+    <script src="{{bootstrap_find_resource('jquery.js', cdn='local')}}"></script>
+    <!--<script src="{{bootstrap_find_resource('js/bootstrap.js', cdn='local')}}"></script>-->
+	<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src={{url_for("static",filename="js/jquery-ui.min.js")}}></script>
+
+    <script src="/static/js/colResizable-1.6.min.js"></script>
+	<script src="http://wwwendt.de/tech/fancytree//src/jquery.fancytree.js"></script>
+	<script src="http://wwwendt.de/tech/fancytree//src/jquery.fancytree.dnd5.js"></script>
+	<script src="http://wwwendt.de/tech/fancytree//src/jquery.fancytree.edit.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.2.3/jquery.contextMenu.min.js"></script>
+	<script src="http://wwwendt.de/tech/fancytree/3rd-party/extensions/contextmenu/js/jquery.fancytree.contextMenu.js"></script>
+
+
+    <script src={{url_for("static",filename="js/inote.js")}}></script>
+
+
+    <script src={{url_for("static",filename="js/inote-list.js")}}></script>
+    <script src={{url_for("static",filename="js/inote-tree.js")}}></script>
+
+    <script src="https://cdn.ckeditor.com/4.4.6/standard/ckeditor.js"></script>
+    <script src={{url_for("static",filename="js/inote-ckeditor.js")}}></script>
+
+    <script>
+
+        $("#inote-table-frame").ready(function(){
+            $("#inote-table-frame").colResizable();
+        });
+
+        $("#category").height($(window).height()-$("#category").position().top-1);
+        $("#items").height($(window).height()-$("#items").position().top-1);
+        $("#content").height($(window).height()-$("#content").position().top-1);
+
+        $(window).resize(function () {
+            $("#category").height($(window).height()-$("#category").position().top-1);
+            $("#items").height($(window).height()-$("#items").position().top-1);
+            $("#content").height($(window).height()-$("#content").position().top-1);
+        });
+
+        var note = null;
+
+        //inote
+            var names = noteSingleton.getInstanceNames();
+            for(var i=0;i<names.length;i++)
+            {
+                $('#inote-new-create').append('<li role="presentation"><a id=c_n_'+ names[i] +' editor_name='+ names[i] +' role="menuitem" tabindex="-1" href="javascript:void(0);">'+ names[i] +'</a></li>');
+                var note_editor_item = $("#c_n_"+names[i]);
+
+                note_editor_item.click(function(){
+                    var editor_name = $(this).attr('editor_name');
+                    var cate_id = get_cur_cate_id();
+                    if(cate_id == null)
+                    {
+                        alert('please select category.');
+                        return;
+                    }
+                    note = new Note(null, cate_id, editor_name);
+                    note.init();
+                });
+            }
+
+    </script>
+{%- endblock scripts %}
